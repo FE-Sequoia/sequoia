@@ -383,4 +383,68 @@
         <tag>数值处理</tag>
       </tags>
   </entry>
+  <entry>
+    <title>面试官：说说你对函数式编程的理解</title>
+    <url>/sequoia/posts/802d3aed.html</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>面试中遇到一部分人对函数式编程不了解，还有一部分认为函数式编程除了面试中能用到，在自己的项目经验中很难看到具体的应用场景。</p>
+<p>函数式编程作为一种编程范式由来已久。函数式编程强调不可变性和纯函数，即函数的输出仅由输入决定，没有副作用和对外部状态的依赖。这种特性使得函数式代码更易于理解、测试和调试。</p>
+<p>函数式编程强调使用<strong>多个函数</strong>来<strong>组合</strong>和来处理数据。其核心是将运算过程抽象成函数，好处是可以<strong>复用</strong>。</p>
+<p>本文将尝试用通俗易懂的方式讲解函数式编程在前端项目中的应用。会对函数式编程进行简单的“扫盲”，然后结合几个实例方便大家理解。</p>
+<h2 id="认识函数式编程"><a href="#认识函数式编程" class="headerlink" title="认识函数式编程"></a>认识函数式编程</h2><p>在开始之前，请先看一个函数式编程的实例。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 纯函数，只做一件事，输入输出，没有副作用</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">double</span>(<span class="params">number</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> number * <span class="number">2</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">square</span>(<span class="params">number</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> number * number;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 不改变原来的数据，创建新的数组</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">doubleArray</span>(<span class="params">arr</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> arr.<span class="title function_">map</span>(double);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">squareArray</span>(<span class="params">arr</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> arr.<span class="title function_">map</span>(square);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 把多个函数组合成一个新的函数</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">compose</span>(<span class="params">...fns</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params">x</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> fns.<span class="title function_">reduceRight</span>(<span class="keyword">function</span>(<span class="params">acc, fn</span>)&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="title function_">fn</span>(acc);</span><br><span class="line">    &#125;, x);</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> numbers = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>];</span><br><span class="line"><span class="keyword">const</span> processArray = <span class="title function_">compose</span>(squareArray, doubleArray);</span><br><span class="line"><span class="keyword">const</span> result = <span class="title function_">processArray</span>(numbers);</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(result); <span class="comment">// [ 4, 16, 36, 64, 100 ]</span></span><br></pre></td></tr></table></figure>
+
+<p>有没有发现，函数式编程在实践中就像用乐高堆积木。</p>
+<p>在这个例子中，先定义了两个纯函数。遵循不可变性原则对需要运算的数组进行新建而不是改变原有数据。最后把多个功能函数组合成一个新的函数，实现需要的功能。</p>
+<h3 id="纯函数"><a href="#纯函数" class="headerlink" title="纯函数"></a>纯函数</h3><p>上面的实例中定义了两个纯函数 <code>double</code> 和 <code>square</code>。那么什么样的函数是纯函数呢？</p>
+<p>根据定义，如果一个函数符合两个条件，它就可以被称为纯函数：</p>
+<ol>
+<li>此函数在相同的输入值时，总是产生相同的输出。</li>
+<li>次函数不会对除了函数返回值之外的任何东西产生可观察的副作用。不会修改传入的参数，也不会对全局状态进行更改，不会进行 I&#x2F;O 操作，也不会触发网络请求等</li>
+</ol>
+<p>由此可见，<strong>纯函数的执行仅仅是为了计算并返回一个值</strong>。</p>
+<p>下面是一个纯函数和非纯函数的对比实例。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 纯函数，不依赖于外部状态，相同的输入总是产生相同的输出</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">add</span>(<span class="params">a, b</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> a + b;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 输出 5</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 输出 5</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 非纯函数，依赖于外部状态，相同的输入可能产生不同的输出</span></span><br><span class="line"><span class="keyword">let</span> result = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">addToResult</span>(<span class="params">value</span>) &#123;</span><br><span class="line">  result += value;</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">addToResult</span>(<span class="number">5</span>)); <span class="comment">// 输出 5</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">addToResult</span>(<span class="number">3</span>)); <span class="comment">// 输出 8</span></span><br></pre></td></tr></table></figure>
+<h3 id="函数是一等公民"><a href="#函数是一等公民" class="headerlink" title="函数是一等公民"></a>函数是一等公民</h3><p>在函数式编程中，函数被视为一等公民。函数可以像其他数据类型（如整数、字符串等）一样被操作、传递和赋值。这种特性使得函数式编程具备更高的抽象能力和灵活性，可以更方便地实现函数的组合和重用。</p>
+<p><strong>1、函数可以被赋值给变量</strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">add</span> = (<span class="params">a, b</span>) =&gt; a + b;</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">multiply</span> = (<span class="params">a, b</span>) =&gt; a * b;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> operation = add; <span class="comment">// 函数赋值给变量</span></span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">operation</span>(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 输出: 5</span></span><br><span class="line"></span><br><span class="line">operation = multiply; <span class="comment">// 可以修改变量的值为另一个函数</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">operation</span>(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 输出: 6</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>2、函数可以作为参数传递</strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">add</span> = (<span class="params">a, b</span>) =&gt; a + b;</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">multiply</span> = (<span class="params">a, b</span>) =&gt; a * b;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">applyOperation</span> = (<span class="params">a, b, operation</span>) =&gt; <span class="title function_">operation</span>(a, b);</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">applyOperation</span>(<span class="number">2</span>, <span class="number">3</span>, add)); <span class="comment">// 输出: 5</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">applyOperation</span>(<span class="number">2</span>, <span class="number">3</span>, multiply)); <span class="comment">// 输出: 6</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>3、函数可以作为返回值返回</strong></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">add</span> = (<span class="params">a, b</span>) =&gt; a + b;</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">multiply</span> = (<span class="params">a, b</span>) =&gt; a * b;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">createOperation</span> = (<span class="params">operator</span>) =&gt; &#123;</span><br><span class="line">  <span class="keyword">if</span> (operator === <span class="string">&#x27;+&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> add;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (operator === <span class="string">&#x27;*&#x27;</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> multiply;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> operation1 = <span class="title function_">createOperation</span>(<span class="string">&#x27;+&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">operation1</span>(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 输出: 5</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> operation2 = <span class="title function_">createOperation</span>(<span class="string">&#x27;*&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">operation2</span>(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 输出: 6</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="函数组合"><a href="#函数组合" class="headerlink" title="函数组合"></a>函数组合</h3><p>函数式编程中还有一个重要的思想就是<code>组合(compose)</code>，它允许我们把逻辑通过函数的形式进行拆分，然后进行函数之间的组合最后得到想要的完整逻辑。文章开篇的实例中已经进行了演示，这里不做重复。</p>
+<p>简言之函数式编程的实践就是对业务逻辑进行拆分，变成一个个纯函数，然后在组合成一个完整的逻辑模块。</p>
+<p>这样做的好处很明显，简化逻辑，复用代码，方便写单元测试。</p>
+<h2 id="函数式编程库推荐"><a href="#函数式编程库推荐" class="headerlink" title="函数式编程库推荐"></a>函数式编程库推荐</h2><p>JavaScript 函数式编程的库有很多，以下是几个常用的库：</p>
+<h3 id="Ramda"><a href="#Ramda" class="headerlink" title="Ramda"></a>Ramda</h3><p>Ramda 是一个专注于函数式编程的 JavaScript 库，提供了许多实用的函数和工具，用于支持函数式编程的开发风格。它强调不可变性、纯函数和柯里化，并提供了丰富的函数来处理和操作数据。</p>
+<ul>
+<li><a href="https://ramda.cn/">中文官网：https://ramda.cn/</a></li>
+<li><a href="https://github.com/ramda/ramda">Github仓库：https://github.com/ramda/ramda</a></li>
+</ul>
+<h3 id="Lodash-fp"><a href="#Lodash-fp" class="headerlink" title="Lodash&#x2F;fp"></a>Lodash&#x2F;fp</h3><p>Lodash 是一个广泛使用的 JavaScript 实用工具库，而 Lodash&#x2F;fp 则是 Lodash 的函数式编程版本。它提供了许多函数式风格的函数，并采用自动柯里化和数据优先的方式。</p>
+<ul>
+<li><a href="https://www.lodashjs.com/">中文官网</a></li>
+<li><a href="https://github.com/lodash/lodash/wiki/FP-Guide">Github仓库：https://github.com/lodash/lodash/wiki/FP-Guide</a></li>
+</ul>
+<h3 id="Immutable-js"><a href="#Immutable-js" class="headerlink" title="Immutable.js"></a>Immutable.js</h3><p>Immutable.js 是一个用于处理不可变数据的 JavaScript 库。它提供了一组持久化的数据结构，如 List、Map、Set 等，以及一些用于操作这些数据结构的函数。通过使用 Immutable.js，可以更轻松地管理和操作不可变数据，避免副作用和数据修改。</p>
+<ul>
+<li><a href="https://immutable-js.com/">官网网站：https://immutable-js.com/</a></li>
+<li><a href="https://github.com/immutable-js/immutable-js/">Github仓库：https://github.com/immutable-js/immutable-js/</a></li>
+</ul>
+<h3 id="RxJS"><a href="#RxJS" class="headerlink" title="RxJS"></a>RxJS</h3><p>RxJS 是一个响应式编程库，它基于观察者模式和可观察序列（Observables）的概念。它提供了丰富的操作符和工具，用于处理异步数据流和事件序列。RxJS 支持函数式编程的思想，提供了一种声明式和组合的方式来处理异步操作。</p>
+<ul>
+<li><a href="https://cn.rx.js.org/">官方网站：https://cn.rx.js.org/</a></li>
+<li><a href="https://github.com/ReactiveX/RxJS">Github：https://github.com/ReactiveX/RxJS</a></li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文简单介绍了函数式编程的基本概念和特点，包括纯函数、函数是一等公民和函数组合。旨在能够让大家方便快速的理解函数数编程是什么。函数式编程可以提高代码的可读性、可维护性和并发性，非常值得学习和应用。</p>
+]]></content>
+      <categories>
+        <category>前端技术</category>
+      </categories>
+      <tags>
+        <tag>函数式编程</tag>
+      </tags>
+  </entry>
 </search>
