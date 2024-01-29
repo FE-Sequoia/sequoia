@@ -316,6 +316,215 @@
       </tags>
   </entry>
   <entry>
+    <title>函数式编程实例之node.js图片处理工具sharp使用指南</title>
+    <url>/sequoia/posts/fe0d3e08.html</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇文章简单介绍了一下<strong>函数式编程</strong>，碰巧最近基于 <code>Node.js</code> 和 <code>sharp</code> 模块做了一个图片压缩工具，想写一篇文章记录一下。</p>
+<p>于是就用函数式编程思想对这个工具就行了重写，本文会着重介绍 <code>sharp</code> 模块的应用，所以和我自己做的工具有关系但是不大，为了方便理解函数式编程我拆解掉了一些复杂的业务功能。</p>
+<p>本文旨在介绍 <code>sharp</code> 模块使用的同时，向大家展示函数式编程的应用，因笔者能力有限，文中难免有错误指出，欢迎大家评论区留言勘误。</p>
+<h2 id="sharp-介绍"><a href="#sharp-介绍" class="headerlink" title="sharp 介绍"></a>sharp 介绍</h2><p>sharp.js 是一个流行的 Node.js 图像处理库，它提供了快速、高质量的图像处理功能。sharp.js 可以用于调整图像大小、裁剪、旋转、锐化、模糊、添加水印等各种图像处理操作。它支持多种图像格式，并提供了灵活的选项和链式调用的方式来进行图像处理。</p>
+<p>sharp 是基于 libvips 库实现的。libvips 是一个开源的图像处理库，它具有高性能和低内存消耗的特点。sharp 利用 libvips 提供的强大功能和优化算法来实现快速且高质量的图像处理操作。</p>
+<p>sharp 利用 libvips 提供的功能，提供了一种简单而高效的 JavaScript 接口，使开发者能够在 Node.js 环境中轻松进行图像处理。通过与 libvips 的紧密集成，sharp 可以充分利用 libvips 的性能和优化，从而实现快速的图像处理操作。</p>
+<p>因此，sharp 的强大和高性能主要来自于底层的 libvips 库，而 sharp 则提供了一个友好的 JavaScript 接口，使开发者能够便捷地使用 libvips 进行图像处理。</p>
+<p><a href="https://sharp.pixelplumbing.com/">sharp官网：https://sharp.pixelplumbing.com/</a></p>
+<p><a href="https://github.com/lovell/sharp">Github项目：https://github.com/lovell/sharp</a></p>
+<h3 id="sharp-使用"><a href="#sharp-使用" class="headerlink" title="sharp 使用"></a>sharp 使用</h3><p>sharp 使用非常简单，它支持像 <code>jQuery</code> 那样的链式调用。它的使用非常简单，下面是一个简单实例，这个实例把一张图片大小调整成300*300，然后进行了裁切，并且把图片质量调整到10来减少图片size，最后保存到本地。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 引入</span></span><br><span class="line"><span class="keyword">const</span> sharp = <span class="built_in">require</span>(<span class="string">&#x27;sharp&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用</span></span><br><span class="line"></span><br><span class="line"><span class="title function_">sharp</span>(<span class="string">&#x27;./images/测试图片.jpg&#x27;</span>)</span><br><span class="line">    .<span class="title function_">resize</span>(<span class="number">300</span>, <span class="number">300</span>)</span><br><span class="line">    .<span class="title function_">extract</span>(&#123;<span class="attr">left</span>: <span class="number">100</span>, <span class="attr">top</span>: <span class="number">100</span>, <span class="attr">width</span>: <span class="number">200</span>, <span class="attr">height</span>: <span class="number">200</span>&#125;)</span><br><span class="line">    .<span class="title function_">jpeg</span>(&#123; <span class="attr">quality</span>: <span class="number">10</span> &#125;)</span><br><span class="line">    .<span class="title function_">toFile</span>(<span class="string">&#x27;./output/demo.jpg&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>使用起来很简单，接下来，我们来用函数式编程的思想对它进行重写。</p>
+<h2 id="实例讲解"><a href="#实例讲解" class="headerlink" title="实例讲解"></a>实例讲解</h2><p>这个实例实现了对图片的缩放、裁剪、格式转换、定制图片优化等功能。使用函数式编程思想把一个个小功能定义成对应的纯函数。最后在处理图片的时候进行组合，实现最终的功能。为了方便功能的最后组合，封装了一个 <code>pipe</code> 管道函数，让所有的方法如同在流水线上一下，按一定的顺序进行执行。</p>
+<p>单独的功能函数都不复杂，如果阅读工程中无法串起来，可以直接看下面的调用。</p>
+<h3 id="压缩图片"><a href="#压缩图片" class="headerlink" title="压缩图片"></a>压缩图片</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 缩放、压缩图片</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Number</span>&#125; width 图片宽度</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Number</span>&#125; height 图片高度</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">resizeImage</span>(<span class="params">width, height</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">async</span> <span class="keyword">function</span> (<span class="params">imageBuffer</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">await</span> <span class="title function_">sharp</span>(<span class="keyword">await</span> imageBuffer).<span class="title function_">resize</span>(width, height).<span class="title function_">toBuffer</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="裁剪图片"><a href="#裁剪图片" class="headerlink" title="裁剪图片"></a>裁剪图片</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 提取、裁切图片</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Number</span>&#125; x x轴</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Number</span>&#125; y y轴</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Number</span>&#125; w 截取宽度</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">number</span>&#125; h 截取高度</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">cropImage</span>(<span class="params">x, y, w, h</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">async</span> <span class="keyword">function</span> (<span class="params">imageBuffer</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">sharp</span>(<span class="keyword">await</span> imageBuffer).<span class="title function_">extract</span>(&#123; <span class="attr">left</span>: x, <span class="attr">top</span>: y, <span class="attr">width</span>: w, <span class="attr">height</span>: h&#125;).<span class="title function_">toBuffer</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="JPG图片处理"><a href="#JPG图片处理" class="headerlink" title="JPG图片处理"></a>JPG图片处理</h3><p>JPG图片处理的可选参数如下：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>quality</td>
+<td>number</td>
+<td>80</td>
+<td>质量，整数 1-100</td>
+</tr>
+<tr>
+<td>progressive</td>
+<td>boolean</td>
+<td>false</td>
+<td>使用逐行（隔行）扫描</td>
+</tr>
+<tr>
+<td>chromaSubsampling</td>
+<td>string</td>
+<td>“‘4:2:0’”</td>
+<td>设置为“4:4:4”以防止色度子采样，否则默认为“4:2:0”色度子采样</td>
+</tr>
+<tr>
+<td>optimiseCoding</td>
+<td>boolean</td>
+<td>true</td>
+<td>优化哈夫曼编码表</td>
+</tr>
+<tr>
+<td>optimizeCoding</td>
+<td>boolean</td>
+<td>true</td>
+<td>optimiseCoding 的替代拼写</td>
+</tr>
+<tr>
+<td>mozjpeg</td>
+<td>boolean</td>
+<td>false</td>
+<td>使用 mozjpeg 默认值，相当于{ trellisQuantisation: true, overshootDeringing: true, optimiseScans: true, quantisationTable: 3 }</td>
+</tr>
+<tr>
+<td>trellisQuantization</td>
+<td>boolean</td>
+<td>false</td>
+<td>应用网格量化</td>
+</tr>
+<tr>
+<td>overshootDeringing</td>
+<td>boolean</td>
+<td>false</td>
+<td>应用过冲去振铃</td>
+</tr>
+<tr>
+<td>optimiseScans</td>
+<td>boolean</td>
+<td>false</td>
+<td>优化逐行扫描，强制逐行扫描</td>
+</tr>
+<tr>
+<td>optimizeScans</td>
+<td>boolean</td>
+<td>false</td>
+<td>optimiseScans 的替代拼写</td>
+</tr>
+<tr>
+<td>quantisationTable</td>
+<td>number</td>
+<td>0</td>
+<td>要使用的量化表，整数 0-8</td>
+</tr>
+<tr>
+<td>quantizationTable</td>
+<td>number</td>
+<td>0</td>
+<td>quantizationTable 的替代拼写</td>
+</tr>
+<tr>
+<td>force</td>
+<td>boolean</td>
+<td>true</td>
+<td>强制 JPEG 输出，否则尝试使用输入格式</td>
+</tr>
+</tbody></table>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 对jpg图片进行处理</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Object</span>&#125; options </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">convertToJPG</span>(<span class="params">options</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">async</span> <span class="keyword">function</span>(<span class="params">imageBuffer</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">sharp</span>(<span class="keyword">await</span> imageBuffer).<span class="title function_">jpeg</span>(options).<span class="title function_">toBuffer</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="PNG图片处理"><a href="#PNG图片处理" class="headerlink" title="PNG图片处理"></a>PNG图片处理</h3><p>PNG图片处理的可选参数如下：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>类型</th>
+<th>默认值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>progressive</td>
+<td>boolean</td>
+<td>false</td>
+<td>使用逐行（隔行）扫描</td>
+</tr>
+<tr>
+<td>compressionLevel</td>
+<td>number</td>
+<td>6</td>
+<td>zlib 压缩级别，0（最快、最大）到 9（最慢、最小）</td>
+</tr>
+<tr>
+<td>adaptiveFiltering</td>
+<td>boolean</td>
+<td>false</td>
+<td>使用自适应行过滤</td>
+</tr>
+<tr>
+<td>palette</td>
+<td>boolean</td>
+<td>false</td>
+<td>量化为具有 alpha 透明度支持的基于调色板的图像</td>
+</tr>
+<tr>
+<td>quality</td>
+<td>number</td>
+<td>100</td>
+<td>使用达到给定质量所需的最少颜色数，设置palette为true</td>
+</tr>
+<tr>
+<td>effort</td>
+<td>number</td>
+<td>7</td>
+<td>CPU 工作量介于 1（最快）和 10（最慢）之间，设置palette为true</td>
+</tr>
+<tr>
+<td>colours</td>
+<td>number</td>
+<td>256</td>
+<td>调色板条目的最大数量，设置palette为true</td>
+</tr>
+<tr>
+<td>colors</td>
+<td>number</td>
+<td>256</td>
+<td>options.colours,的替代拼写palette为true</td>
+</tr>
+<tr>
+<td>dither</td>
+<td>number</td>
+<td>1.0</td>
+<td>Floyd-Steinberg 误差扩散水平，设置palette为true</td>
+</tr>
+<tr>
+<td>force</td>
+<td>boolean</td>
+<td>true</td>
+<td>强制 PNG 输出，否则尝试使用输入格式</td>
+</tr>
+</tbody></table>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 对png图片进行处理</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Object</span>&#125; options </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">convertToPNG</span>(<span class="params"></span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">async</span> <span class="keyword">function</span>(<span class="params">imageBuffer</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">sharp</span>(<span class="keyword">await</span> imageBuffer).<span class="title function_">png</span>(options).<span class="title function_">toBuffer</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="转变图片格式"><a href="#转变图片格式" class="headerlink" title="转变图片格式"></a>转变图片格式</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 转变图片格式</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">*</span>&#125; format </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">convertToFormat</span> (format) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">async</span> <span class="keyword">function</span> (<span class="params">imageBuffer</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">sharp</span>(<span class="keyword">await</span> imageBuffer).<span class="title function_">toFormat</span>(format).<span class="title function_">toBuffer</span>();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="保存图片"><a href="#保存图片" class="headerlink" title="保存图片"></a>保存图片</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 保存图片到指定路径</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">String</span>&#125; 图片保存路径</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">saveImage</span>(<span class="params">outputPath</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">async</span> <span class="keyword">function</span> (<span class="params">imageBuffer</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="title function_">sharp</span>(<span class="keyword">await</span> imageBuffer).<span class="title function_">toFile</span>(outputPath)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="管道-辅助-函数"><a href="#管道-辅助-函数" class="headerlink" title="管道(辅助)函数"></a>管道(辅助)函数</h3><p>管道函数是一个编程概念，用于将多个函数连接在一起，形成一个函数链。每个函数的输出作为下一个函数的输入，数据在这个函数链中顺序流动，类似于管道中的流体。</p>
+<p>管道函数的主要作用是简化代码和增强可读性。通过将多个函数链接在一起，可以将复杂的操作拆分成更小、更可管理的部分。每个函数只需关注自己的输入和输出，而不需要关心整个处理流程。这样可以降低代码的复杂性和维护成本。</p>
+<p>另外，管道函数还可以提高代码的可组合性和可重用性。每个函数都可以在不同的上下文中使用，只需根据需要重新组合函数链即可。这种组合性使得代码更加灵活，可以根据需求进行定制化的数据处理。</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 辅助函数</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">Function</span>&#125; 管道函数</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">pipe</span>(<span class="params">...fns</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">function</span> (<span class="params">x</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> fns.<span class="title function_">reduce</span>(<span class="function">(<span class="params">v, fn</span>) =&gt;</span> <span class="title function_">fn</span>(v), x);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="功能组合"><a href="#功能组合" class="headerlink" title="功能组合"></a>功能组合</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@description</span> 组合功能实现对图片的处理</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">*</span>&#125; inputPath 图片输入路径</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">*</span>&#125; outputPath 图片输出路径</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> &#123;<span class="type">*</span>&#125; options 其他图片配置</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@returns</span> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">processImage</span> (inputPath, outputPath, options) &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; width, height, format, crop &#125; = options;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 压缩和裁剪图片</span></span><br><span class="line">    <span class="keyword">const</span> resizeAndCrop = <span class="title function_">pipe</span>(</span><br><span class="line">        <span class="title function_">resizeImage</span>(width, height),</span><br><span class="line">        crop ? <span class="title function_">cropImage</span>(crop.<span class="property">x</span>, crop.<span class="property">y</span>, crop.<span class="property">w</span>, crop.<span class="property">h</span>) : <span class="function">(<span class="params">imageBuffer</span>) =&gt;</span> imageBuffer</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 保存图片</span></span><br><span class="line">    <span class="keyword">const</span> saveToFile = <span class="title function_">saveImage</span>(outputPath);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 组合调用</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">pipe</span>(</span><br><span class="line">        <span class="function">() =&gt;</span> <span class="title function_">sharp</span>(inputPath).<span class="title function_">toBuffer</span>(),</span><br><span class="line">        resizeAndCrop,</span><br><span class="line">        <span class="title function_">convertToFormat</span>(format),</span><br><span class="line">        <span class="title function_">convertToPNG</span>(&#123; <span class="attr">quality</span>: <span class="number">10</span>&#125;),</span><br><span class="line">        saveToFile</span><br><span class="line">    )();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="实例应用"><a href="#实例应用" class="headerlink" title="实例应用"></a>实例应用</h3><figure class="highlight js"><table><tr><td class="code"><pre><span class="line"><span class="keyword">const</span> inputPath = <span class="string">&#x27;./images/测试图片.jpg&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> outputPath = <span class="string">&#x27;./output/demo.png&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">    <span class="attr">width</span>: <span class="number">500</span>,</span><br><span class="line">    <span class="attr">height</span>: <span class="number">400</span>,</span><br><span class="line">    <span class="attr">format</span>: <span class="string">&#x27;png&#x27;</span>,</span><br><span class="line">    <span class="attr">crop</span>: &#123;</span><br><span class="line">        <span class="attr">x</span>: <span class="number">100</span>,</span><br><span class="line">        <span class="attr">y</span>: <span class="number">100</span>,</span><br><span class="line">        <span class="attr">w</span>: <span class="number">300</span>,</span><br><span class="line">        <span class="attr">h</span>: <span class="number">300</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="title function_">processImage</span>(inputPath, outputPath, options).<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;图片处理并保存成功&#x27;</span>);</span><br><span class="line">&#125;).<span class="title function_">catch</span>(<span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;图片处理过程中发生错误：&#x27;</span>, err.<span class="property">message</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文简要介绍了 <code>sharp</code> 模块，它是一个基于 Node.js 的高性能图像处理库。通过与底层的 libvips 库紧密集成，sharp 可以实现快速且高质量的图像处理操作。同时，本文还向大家展示了函数式编程思想在实际项目中的应用。通过将复杂的业务逻辑拆解成小的纯函数，并利用管道函数进行组合，可以实现代码的简化、可读性的增强，同时还提高了代码的可组合性和可重用性。希望本文能够帮助大家更好地理解 <code>sharp</code> 模块的使用，并对函数式编程的应用有进一步的认识。</p>
+]]></content>
+      <categories>
+        <category>前端技术</category>
+      </categories>
+      <tags>
+        <tag>函数式编程</tag>
+        <tag>图片处理</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>前端金额运算精度丢失问题及解决方案</title>
     <url>/sequoia/posts/8a919224.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>前端开发中难免会遇到价格和金额计算的需求，这类需求所要计算的数值大多数情况下是要求精确到小数点后到多少位。但是因为JS语言本身的缺陷，在处理浮点数的运算时会出现一些奇怪的问题，导致计算不精确。</p>
