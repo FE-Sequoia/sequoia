@@ -6,14 +6,14 @@
     <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><hr>
 <p>CSS3的 网格布局（Grid）是最强大的 CSS 布局方案。</p>
 <p>它将网页划分成一个个网格，可以任意组合不同的网格，做出各种各样的布局。</p>
+<span id="more"></span>
+
 <p><img src="/sequoia/images/Pasted%20image%2020240109112509.png" alt="2020240109112509.png"> </p>
 <p>上图这样的布局，就可以用 Grid 布局轻松实现。</p>
 <p>Grid 布局和 Flex 布局有一定的相似性，都可以指定容器内部多个项目的位置。但是，它们也存在重大区别。</p>
 <p>Flex 布局是轴线布局，只能指定”项目”针对轴线的位置，可以看作是<strong>一维布局</strong>。</p>
 <p>Grid 布局则是将容器划分成”行”和”列”，产生单元格，然后指定”项目所在”的单元格，可以看作是<strong>二维布局</strong>。</p>
 <p>Grid 布局远比 Flex 布局强大。</p>
-<span id="more"></span>
-
 <h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><hr>
 <p>学习 Grid 布局之前，需要了解一些基本概念。</p>
 <h3 id="2-1-容器和项目"><a href="#2-1-容器和项目" class="headerlink" title="2.1 容器和项目"></a>2.1 容器和项目</h3><p>采用网格布局的区域，称为”容器”（container）。容器内部采用网格定位的子元素，称为”项目”（item）。</p>
@@ -595,6 +595,65 @@
       </categories>
       <tags>
         <tag>数值处理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何用Python3做支付宝沙箱支付</title>
+    <url>/sequoia/posts/10d5fbd2.html</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在一些业务开发中会遇到在线支付的需求。因为这个功能涉及到钱，在开发过程中难免存在调试障碍。好在国内的主流支付平台如支付宝和微信支付都已经提供了沙箱环境，在这个沙箱环境中可以很方便的对接入的支付功能进行调试和开发。</p>
+<p>本文会以Python3为开发语言接入支付宝沙箱支付功能为例进行讲解，力争写出一个完善详实的操作指南，不尽之处，欢迎在评论区留言。</p>
+<span id="more"></span>
+
+<h2 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h2><p>支付宝沙箱支付的文档地址：<a href="https://opendocs.alipay.com/common/02kkv7?pathHash=9a45a6d6">https://opendocs.alipay.com/common/02kkv7?pathHash=9a45a6d6</a></p>
+<blockquote>
+<p>沙箱环境是支付宝开放平台为开发者提供的与生产环境完全隔离的联调测试环境，开发者在沙箱环境中完成的接口调用不会对生产环境中的数据造成任何影响。</p>
+<p>沙箱为开放的产品提供 <strong>有限功能范围</strong> 的支持，可以覆盖产品的绝大部分核心链路和对接逻辑，便于开发者快速学习、尝试、开发和调试。</p>
+</blockquote>
+<p>官方文档对大部分操作写的都很详细，按照文档操作基本可以解决大部分问题。</p>
+<p>登录沙箱支付控制台后，会提供沙箱支付的账号和appid已经应用公钥，应用私钥需要使用<a href="https://opendocs.alipay.com/common/02kipk">支付宝开发平台密钥工具</a>生成。</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240219115120.png" alt="20240219115120.png"></p>
+<p>在做完这些准备工作后就可以在代码中进行沙箱支付接入实现了。</p>
+<p>另外支付宝官方还给贴心的给出了在线调试方案：<a href="https://open.alipay.com/api/apiDebug">https://open.alipay.com/api/apiDebug</a></p>
+<h3 id="沙箱支付控制台"><a href="#沙箱支付控制台" class="headerlink" title="沙箱支付控制台"></a>沙箱支付控制台</h3><p>登录沙箱支付控制台之后你看到的界面如下：</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240219132843.png" alt="20240219132843.png"></p>
+<p>同时可以拿到相关的沙箱账号，切记这里还需要配合下载安装<strong>支付宝沙箱版</strong>扫码才能使用。</p>
+<p><strong>重要：这里接口加签方式选自定义</strong></p>
+<h3 id="公私钥配置"><a href="#公私钥配置" class="headerlink" title="公私钥配置"></a>公私钥配置</h3><p>进入到支付宝沙箱支付控制台，点击沙箱应用。  </p>
+<p><img src="/sequoia/images/Pasted%20image%2020240219141458.png" alt="20240219141458.png"></p>
+<p>公钥是基于私钥生成的，可解密，但是私钥不行。</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240219141609.png" alt="20240219141609.png"></p>
+<p>使用<strong>支付宝开发平台密钥工具</strong>，生成支付宝公私钥。</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240219141652.png" alt="20240219141652.png"></p>
+<p>最后在项目中新建 <code>private_key.txt</code> 和 <code>public_key.txt</code>这两个文件，把私钥和公钥内容粘贴到对应的文件中，供SDK使用。</p>
+<p>注意，因为公钥、私钥的内容需要放到如下文本中间：</p>
+<p>公钥</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-----BEGIN PUBLIC KEY-----</span><br><span class="line">这里放你的公钥</span><br><span class="line">-----END PUBLIC KEY-----</span><br></pre></td></tr></table></figure>
+
+<p>私钥</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">-----BEGIN PRIVATE KEY-----</span><br><span class="line">这里放你的私钥</span><br><span class="line">-----END PRIVATE KEY-----</span><br></pre></td></tr></table></figure>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><h3 id="安装SDK"><a href="#安装SDK" class="headerlink" title="安装SDK"></a>安装SDK</h3><p>支付宝官方提供了一个Python的SDK叫<a href="https://pypi.org/project/alipay-sdk-python/">alipay-sdk-python</a>，但是这个亲测发现非常难用，最要命的是文档不全，<strong>不推荐使用</strong>。</p>
+<p>这里推荐使用 <a href="https://github.com/fzlee/alipay">python-alipay-sdk</a>，这个模块对支付宝官方的接口做了封装，使用起来及其简单方便。这是一个开源项目，使用的人不少，有1.2k的star，文档也很简洁。</p>
+<p>安装依赖</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">pip install python-alipay-sdk</span><br></pre></td></tr></table></figure>
+<h3 id="封装支付类"><a href="#封装支付类" class="headerlink" title="封装支付类"></a>封装支付类</h3><p>新建 <code>alipay.py</code> 文件，写入如下代码：</p>
+<p>这里需要注意：<code>private_key.txt</code> 、<code>public_key.txt</code> 这两个文件的路径。</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> alipay <span class="keyword">import</span> AliPay</span><br><span class="line"></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string"># 初始化支付对象</span></span><br><span class="line"><span class="string">out_trade_no 商品订单号  唯一的</span></span><br><span class="line"><span class="string">total_amount 商品价格</span></span><br><span class="line"><span class="string">subject 商品的名称</span></span><br><span class="line"><span class="string">return_url 同步回调网址--用于前端，付成功之后回调</span></span><br><span class="line"><span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">alipay</span> (out_trade_no, total_amount, subject, return_url):</span><br><span class="line">    <span class="comment"># 实例化支付类</span></span><br><span class="line">    alipayCase = AliPay(</span><br><span class="line">        appid = <span class="string">&#x27;xxxxxxxxx&#x27;</span>, <span class="comment"># 换成你自己的</span></span><br><span class="line">        app_notify_url=<span class="literal">None</span>,  <span class="comment"># 默认回调 url</span></span><br><span class="line">        app_private_key_string = <span class="built_in">open</span>(<span class="string">&quot;private_key.txt&quot;</span>).read(),</span><br><span class="line">        alipay_public_key_string = <span class="built_in">open</span>(<span class="string">&quot;public_key.txt&quot;</span>).read(),</span><br><span class="line">        sign_type = <span class="string">&#x27;RSA2&#x27;</span>,  <span class="comment"># RSA 或者 RSA2</span></span><br><span class="line">        debug = <span class="literal">True</span>,  <span class="comment"># 默认 False，这里设为True SDK内部就会走沙箱支付，False就是正常支付</span></span><br><span class="line">        verbose = <span class="literal">False</span>  <span class="comment"># 输出调试数据</span></span><br><span class="line">    )</span><br><span class="line">    <span class="comment"># 生成收款二维码</span></span><br><span class="line">    alipayQRCode = alipayCase.api_alipay_trade_precreate(</span><br><span class="line">        out_trade_no = out_trade_no,</span><br><span class="line">        total_amount = total_amount,</span><br><span class="line">        subject = subject,</span><br><span class="line">        notify_url = return_url</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">return</span> alipayQRCode[<span class="string">&#x27;qr_code&#x27;</span>]</span><br></pre></td></tr></table></figure>
+<h3 id="调用支付"><a href="#调用支付" class="headerlink" title="调用支付"></a>调用支付</h3><p>下面的实例代码调用了上面封装的支付函数，通过接口把收款二维码返回给前台。</p>
+<blockquote>
+<p>这个例子使用的是 <code>django</code> 框架，<code>ctx.response</code> 是框架提供的响应函数，明白意思即可。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> alipay <span class="keyword">import</span> alipay</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">Alipay</span> (self, ctx):</span><br><span class="line">	<span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">	支付宝支付API</span></span><br><span class="line"><span class="string">	@param &#123;Object&#125; ctx http请求上下文</span></span><br><span class="line"><span class="string">	&quot;&quot;&quot;</span></span><br><span class="line">	<span class="built_in">print</span>(<span class="string">&quot;===================支付宝=====================&quot;</span>)</span><br><span class="line">	</span><br><span class="line">	payUrl = alipay(</span><br><span class="line">		out_trade_no = <span class="built_in">str</span>(<span class="built_in">int</span>(time.time() * <span class="number">1000</span>)),</span><br><span class="line">		total_amount = ctx.query[<span class="string">&#x27;pay_money&#x27;</span>],</span><br><span class="line">		subject = ctx.query[<span class="string">&#x27;goods_name&#x27;</span>],</span><br><span class="line">		return_url = <span class="string">&#x27;&#x27;</span></span><br><span class="line">	)</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> ctx.response(json.dumps(&#123;<span class="string">&quot;result&quot;</span>: payUrl&#125;, ensure_ascii=<span class="literal">False</span>))</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文演示了如何使用Python3做支付宝沙箱支付功能，简单介绍了官方文档中沙箱支付的配置和使用，指出使用过程中需要注意的点。</p>
+<p>最后给出了一个沙箱支付应用的实例，从SDK选择和安装，到封装支付类和业务中调用，力求将支付宝沙箱支付功能操作讲解清晰。</p>
+<p>最后的最后，不要用官方SDK！不要用官方SDK！不要用官方SDK！</p>
+]]></content>
+      <categories>
+        <category>Python</category>
+      </categories>
+      <tags>
+        <tag>沙箱支付</tag>
+        <tag>支付宝</tag>
+        <tag>在线支付</tag>
       </tags>
   </entry>
   <entry>
