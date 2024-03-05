@@ -664,6 +664,52 @@
       </tags>
   </entry>
   <entry>
+    <title>在ElementUI项目中集成iconfont图标库</title>
+    <url>/sequoia/posts/f5462403.html</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在前端项目开发中经常会遇到使用的组件库提供的ICON图标不够用的情况。最常见的解决方案无非就是把设计图的图标切图引入到项目中。还有就是使用svg图标，封装一个渲染组件在项目里面直接引入这个组件。</p>
+<p>本文将介绍另一种方法，即集成iconfont图标库的图标到项目中去，用最小化的改动满足图标需求。</p>
+<span id="more"></span>
+
+<h2 id="快速开始"><a href="#快速开始" class="headerlink" title="快速开始"></a>快速开始</h2><p>1、打开阿里巴巴的图标库网站：<a href="https://www.iconfont.cn/collections/index">https://www.iconfont.cn/collections/index</a>，登录自己的账号。</p>
+<p>完成这一步你会看到这样的界面。</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240305110700.png" alt="20240305110700"></p>
+<p>2、搜索你需要的图标，然后选中你需要的图标，点击添加购物车，步骤如下图所示：</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240305110909.png" alt="20240305110909"></p>
+<p>3、点击菜单栏购物车之后，弹出下面的页面，点击添加至项目。在弹出的侧栏里面选择要把图标添加到的项目，如果没有项目就新建。</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240305111046.png" alt="20240305111046"><br><img src="/sequoia/images/Pasted%20image%2020240305111330.png" alt="20240305111330"></p>
+<p>4、把图标加入到指定的项目后，点击确定你就会跳转到项目详情页面，在这个页面点击项目设置，对图标前缀和字体名称做一些简单的设置，如下图。</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240305111708.png" alt="20240305111708"></p>
+<ol>
+<li>将 <code>FontClass/Symbol</code> 前缀修改为 <code>el-icon-</code></li>
+<li>将 <code>Font Family</code> 是 <code>element-icons</code></li>
+</ol>
+<p><img src="/sequoia/images/Pasted%20image%2020240305111906.png" alt="20240305111906"></p>
+<p>修改完成后，点击保存。</p>
+<p>5、下载图标文件到本地</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240305112146.png" alt="20240305112146"></p>
+<p>解压后下载包内容如下图所示</p>
+<p><img src="/sequoia/images/Pasted%20image%2020240305112303.png" alt="20240305112303"></p>
+<ol>
+<li>iconfont.ttf、iconfont.woff、iconfong.woff2 是图标字体文件，可以把它们复制到你的项目中的 <code>fonts</code> 目录下。</li>
+<li>iconfont.css 是 <code>Font Class</code> 方式使用图标的CSS代码，内容如下，但是<strong>记得修改图标字体文件的路径</strong></li>
+</ol>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="keyword">@font-face</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">&quot;element-icons&quot;</span>;</span><br><span class="line">  <span class="attribute">src</span>: <span class="built_in">url</span>(<span class="string">&#x27;iconfont.woff2?t=1709537603593&#x27;</span>) <span class="built_in">format</span>(<span class="string">&#x27;woff2&#x27;</span>),</span><br><span class="line">       <span class="built_in">url</span>(<span class="string">&#x27;iconfont.woff?t=1709537603593&#x27;</span>) <span class="built_in">format</span>(<span class="string">&#x27;woff&#x27;</span>),</span><br><span class="line">       <span class="built_in">url</span>(<span class="string">&#x27;iconfont.ttf?t=1709537603593&#x27;</span>) <span class="built_in">format</span>(<span class="string">&#x27;truetype&#x27;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.element-icons</span> &#123;</span><br><span class="line">  <span class="attribute">font-family</span>: <span class="string">&quot;element-icons&quot;</span> <span class="meta">!important</span>;</span><br><span class="line">  <span class="attribute">font-size</span>: <span class="number">18px</span>;</span><br><span class="line">  <span class="attribute">font-style</span>: normal;</span><br><span class="line">  -webkit-<span class="attribute">font-smoothing</span>: antialiased;</span><br><span class="line">  -moz-osx-<span class="attribute">font-smoothing</span>: grayscale;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="selector-class">.el-icon-xitong</span><span class="selector-pseudo">:before</span> &#123;</span><br><span class="line">  <span class="attribute">content</span>: <span class="string">&quot;\e67c&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>6、把 iconfont.css 引入到项目中，在需要的地方就可以使用类名 <code>el-icon-xitong</code> 使用我们刚刚添加到项目中的图标了。</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">i</span> <span class="attr">class</span>=<span class="string">&quot;el-icon-xitong&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">i</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文试图提供一种方便快捷的方法，帮助开发人员将iconfont图标集成到他们的前端项目中，满足项目对图标的需求。介绍了阿里巴巴图标库网站的使用方式，以及如何对图标项目进行设置，让这些图标可以直接在element-ui项目中应用。</p>
+<p>不尽之处，欢迎评论区交流。</p>
+]]></content>
+      <categories>
+        <category>前端技术</category>
+      </categories>
+      <tags>
+        <tag>iconfont</tag>
+        <tag>element-ui</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>在Vue项目中使用xlsx模块读取Excel文档内容</title>
     <url>/sequoia/posts/514c5c9e.html</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在前端项目开发中，读写Excel文件的需求变得越来越常见。以往，这些任务通常由后端处理，但随着前端技术的发展和浏览器功能的提升，JavaScript为我们提供了更多处理本地文件的能力。其中，FileReader对象是一个强大的工具，允许浏览器对用户本地文件进行操作。此外，一些技术大佬们贡献的工具类库如xlsx模块，进一步简化了在前端读取和解析Excel文件的过程。</p>
