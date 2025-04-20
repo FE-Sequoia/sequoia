@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "红杉的网络日志",
   description: "慢就是快，积微者成。",
+  cleanUrls: true,
   base: "/sequoia/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
