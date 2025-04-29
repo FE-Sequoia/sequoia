@@ -7,7 +7,25 @@ export default defineConfig({
   cleanUrls: true,
   base: "/sequoia/",
   lastUpdated: true,
+  markdown: {
+    lineNumbers: true,
+    image: {
+      // 默认禁用；设置为 true 可为所有图片启用懒加载。
+      lazyLoading: true
+    },
+    container: {
+      tipLabel: '内容详情',
+      warningLabel: '注意',
+      dangerLabel: '危险',
+      infoLabel: '信息',
+      detailsLabel: '详细信息'
+    }
+  },
   themeConfig: {
+    search: {
+      provider: 'local'
+    },
+    
     // https://vitepress.dev/reference/default-theme-config
     nav: nav(),
 
