@@ -5,14 +5,14 @@ layout: home
 hero:
   name: "红杉的网络日志"
   text: "慢就是快，积微者成。"
-  tagline: My great project tagline
+  tagline: 以终为始，Get Things Done.
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: 北漂杂记
+      link: /jobs/
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: 关于我
+      link: /about-me
 
 features:
   - title: Feature A
@@ -22,4 +22,3 @@ features:
   - title: Feature C
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
 ---
-
