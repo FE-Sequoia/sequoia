@@ -59,10 +59,11 @@ function nav(): DefaultTheme.NavItem[] {
 function sidebarJobs() {
   return [
     {
-      text: '北漂纪要',
+      text: '杂记',
       collapsed: false,
       base: '/jobs/notes-',
       items: [
+        { text: '我的减肥挑战', link: 'lose-weight' },
         { text: '我相信人都是善良的', link: 'suyang' },
         { text: '你的头发挺密的啊', link: 'qiang' },
         { text: '夜王的屁股', link: 'yewang' },
@@ -77,7 +78,7 @@ function sidebarJobs() {
       ]
     },
     {
-      text: '言论文摘',
+      text: '文摘',
       collapsed: false,
       items: [
         { text: '苏联笑话集锦', link: '/jobs/jokes' },
