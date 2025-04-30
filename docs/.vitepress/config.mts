@@ -59,16 +59,34 @@ function nav(): DefaultTheme.NavItem[] {
 function sidebarJobs() {
   return [
     {
-      text: '杂记见闻',
+      text: '北漂纪要',
       collapsed: false,
       items: [
-        { text: '苏阳：我相信人都是善良的', link: '/jobs/' }
+        {
+          text: '杂记见闻',
+          base: '/jobs/notes-',
+          items: [
+            { text: '我相信人都是善良的', link: 'suyang' },
+            { text: '你的头发挺密的啊', link: 'qiang' },
+            { text: '夜王的屁股', link: 'yewang' },
+            { text: '超子', link: 'chaos' }
+          ]
+        },
+        
+        {
+          text: '历史里的故事',
+          base: '/jobs/history-',
+          items: [
+            { text: '恩德培行动', link: 'entebbe' }
+          ]
+        }
       ]
     },
     {
       text: '言论文摘',
       collapsed: false,
       items: [
+        { text: '苏联笑话集锦', link: '/jobs/jokes' },
         { text: '2025·四月', link: '/jobs/summary' }
       ]
     }
