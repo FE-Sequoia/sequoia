@@ -61,18 +61,12 @@ function sidebarJobs() {
     {
       text: '北漂纪要',
       collapsed: false,
+      base: '/jobs/notes-',
       items: [
-        {
-          text: '杂记见闻',
-          base: '/jobs/notes-',
-          items: [
-            { text: '我相信人都是善良的', link: 'suyang' },
-            { text: '你的头发挺密的啊', link: 'qiang' },
-            { text: '夜王的屁股', link: 'yewang' },
-            { text: '超子', link: 'chaos' }
-          ]
-        },
-        
+        { text: '我相信人都是善良的', link: 'suyang' },
+        { text: '你的头发挺密的啊', link: 'qiang' },
+        { text: '夜王的屁股', link: 'yewang' },
+        { text: '超子', link: 'chaos' },
         {
           text: '历史里的故事',
           base: '/jobs/history-',
