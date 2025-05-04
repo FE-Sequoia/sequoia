@@ -4,6 +4,7 @@ import { defineConfig, type DefaultTheme } from 'vitepress'
 export default defineConfig({
   title: "红杉的网络日志",
   description: "慢就是快，积微者成。",
+  head: [['link', { rel: 'icon', href: '/bishe-workshop/favicon.ico' }]],
   cleanUrls: true,
   base: "/sequoia/",
   lastUpdated: true,
@@ -22,6 +23,7 @@ export default defineConfig({
     }
   },
   themeConfig: {
+    logo: "/logo.png",
     search: {
       provider: 'local'
     },
