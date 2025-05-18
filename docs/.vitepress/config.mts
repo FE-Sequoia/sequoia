@@ -66,8 +66,9 @@ function sidebarJobs() {
       base: '/jobs/notes-',
       items: [
         { text: '我的减肥挑战', link: 'lose-weight' },
-        { text: '乌贼与龙虾', link: 'origin' },
+        { text: '走向死亡的完美主义者', link: 'perfectionist' },
         { text: '你的工作不是你的工作', link: 'lifeos' },
+        { text: '乌贼与龙虾', link: 'origin' },
         {
           text: '历史里的故事',
           base: '/jobs/history-',
