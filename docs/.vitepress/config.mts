@@ -65,7 +65,8 @@ function sidebarJobs() {
       collapsed: false,
       base: '/jobs/notes-',
       items: [
-        { text: '我的减肥挑战', link: 'lose-weight' },
+        { text: '减肥挑战', link: 'lose-weight' },
+        { text: '大龄程序员的失业焦虑', link: 'jobs' },
         { text: '走向死亡的完美主义者', link: 'perfectionist' },
         { text: '你的工作不是你的工作', link: 'lifeos' },
         { text: '乌贼与龙虾', link: 'origin' },
@@ -83,7 +84,7 @@ function sidebarJobs() {
       collapsed: false,
       items: [
         { text: '苏联笑话集锦', link: '/jobs/jokes' },
-        { text: '2025·四月', link: '/jobs/summary' }
+        { text: '2025文章集锦', link: '/jobs/summary' }
       ]
     }
   ]
