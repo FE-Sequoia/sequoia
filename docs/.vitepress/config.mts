@@ -15,7 +15,7 @@ export default defineConfig({
       lazyLoading: true
     },
     container: {
-      tipLabel: '内容详情',
+      tipLabel: 'Tips',
       warningLabel: '注意',
       dangerLabel: '危险',
       infoLabel: '信息',
@@ -66,6 +66,7 @@ function sidebarJobs() {
       base: '/jobs/notes-',
       items: [
         { text: '减肥挑战', link: 'lose-weight' },
+        { text: '为什么放假比上班还焦虑', link: 'holiday' },
         { text: '大龄程序员的失业焦虑', link: 'jobs' },
         { text: '走向死亡的完美主义者', link: 'perfectionist' },
         { text: '你的工作不是你的工作', link: 'lifeos' },
