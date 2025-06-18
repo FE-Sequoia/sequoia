@@ -33,7 +33,8 @@ export default defineConfig({
 
     sidebar: {
       '/jobs/': sidebarJobs(),
-      '/hobby/': sidebarBobby()
+      '/hobby/': sidebarBobby(),
+      '/interview/': sidebarInterview(),
     },
 
     lastUpdatedText: '最后更新',
@@ -53,7 +54,7 @@ function nav(): DefaultTheme.NavItem[] {
   return [
     { text: '首页', link: '/' },
     { text: '北漂杂记', link: '/jobs/', activeMatch: '/jobs/' },
-    { text: '兴趣&爱好', link: '/hobby/video_editing/', activeMatch: '/hobby/' },
+    { text: '前端面试', link: '/interview/stack-vue/', activeMatch: '/interview/' },
     { text: '关于', link: '/about-me' }
   ]
 }
@@ -105,6 +106,73 @@ function sidebarBobby() {
       collapsed: false,
       items: [
         { text: '写作理论', link: '/hobby/novel_writing/' }
+      ]
+    }
+  ]
+}
+
+// 面试
+function sidebarInterview() {
+  return [
+    {
+      text: '技术栈',
+      collapsed: false,
+      base: '/interview/stack-',
+      items: [
+        { text: 'HTML/CSS', link: 'html-css' },
+        { text: 'JavaScript', link: 'javascript' },
+        { text: '浏览器', link: 'browser' },
+        { text: 'Vue2(3)', link: 'vue' },
+        { text: 'React', link: 'react' },
+      ]
+    },
+    {
+      text: '工程化',
+      collapsed: true,
+      base: '/interview/engineering-',
+      items: [
+        { text: 'WebPack', link: 'webpack' },
+      ]
+    },
+    {
+      text: '网络与安全',
+      collapsed: true,
+      base: '/interview/net-',
+      items: [
+        { text: 'HTTP/TCP', link: 'http-tcp' }
+      ]
+    },
+    {
+      text: '算法和数据结构',
+      collapsed: true,
+      base: '/interview/algorithm-',
+      items: [
+        { text: '算法数据', link: 'leetcode' }
+      ]
+    },
+    {
+      text: '系统设计',
+      collapsed: true,
+      base: '/interview/design-',
+      items: [
+        { text: '前端架构', link: 'system' }
+      ]
+    },
+    {
+      text: '软实力',
+      collapsed: true,
+      base: '/interview/power-',
+      items: [
+        { text: '面试技巧', link: 'QA' }
+      ]
+    },
+    {
+      text: '简历',
+      collapsed: true,
+      base: '/interview/resume-',
+      items: [
+        { text: '开发岗', link: 'developer' },
+        { text: '管理岗', link: 'manage' }
       ]
     }
   ]
